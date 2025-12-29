@@ -19,6 +19,8 @@ def load_rr_mac(path: str) -> List[NameAndMac]:
     res = []
     with open(path, 'r') as f:
         for line in f.readlines()[1:]:
+            if not line.strip():
+                continue
             name, mac = line.split(',')
             res.append(NameAndMac(name, mac))
     return res
