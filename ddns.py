@@ -62,8 +62,14 @@ def update_records():
     logging.info('Starting updating dns records.')
     logging.info('Getting IPv4 address via API.')
     public_ipv4_addr = get_public_ip_addr_ver4().strip() if ipv4 else None
+    if ipv4 and public_ipv4_addr == '':
+        logging.info('Cannot get IPv6 address from API.')
+        return 'Cannot get IPv4 address from API.', 200
     logging.info('Getting IPv6 prefix via API.')
     public_ipv6_addr = get_public_ip_addr_ver6().strip() if ipv6 else None
+    if ipv6 and public_ipv6_addr == '':
+        logging.info('Cannot get IPv6 address from API.')
+        return 'Cannot get IPv6 address from API.', 200
     ipv6_prefix = ':'.join(public_ipv6_addr.split(':')[:4]) + '::/64' if ipv6 else None
 
     for rr, mac in load_rr_mac(rr_list_file):
