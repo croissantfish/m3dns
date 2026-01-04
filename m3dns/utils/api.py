@@ -24,7 +24,7 @@ def ipify_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     return myip
 
 def ipify_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
-    myip = str(urlopen('https://api64.ipify.org').read(), encoding='utf-8')
+    myip = str(urlopen('https://api4.ipify.org').read(), encoding='utf-8')
     if result_queue is not None:
         result_queue.put(myip)
     return myip
