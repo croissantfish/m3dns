@@ -1,9 +1,10 @@
 import multiprocessing as mp
 import subprocess
-import sys
 import time
 from typing import Optional
 from urllib.request import urlopen
+import netaddr
+
 
 def ip_sb_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://api-ipv4.ip.sb/ip').read(), encoding='utf-8')
@@ -13,9 +14,13 @@ def ip_sb_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
 
 def ip_sb_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://api-ipv6.ip.sb/ip').read(), encoding='utf-8')
-    if result_queue is not None:
-        result_queue.put(myip)
-    return myip
+    try:
+        myip = netaddr.IPAddress(myip).format(dialect=netaddr.ipv6_verbose)
+        if result_queue is not None:
+            result_queue.put(myip)
+        return myip
+    except:
+        pass
 
 def ipify_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://api.ipify.org').read(), encoding='utf-8')
@@ -25,9 +30,13 @@ def ipify_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
 
 def ipify_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://api4.ipify.org').read(), encoding='utf-8')
-    if result_queue is not None:
-        result_queue.put(myip)
-    return myip
+    try:
+        myip = netaddr.IPAddress(myip).format(dialect=netaddr.ipv6_verbose)
+        if result_queue is not None:
+            result_queue.put(myip)
+        return myip
+    except:
+        pass
 
 def icanhazip_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://icanhazip.com').read(), encoding='utf-8')
@@ -37,9 +46,13 @@ def icanhazip_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
 
 def icanhazip_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = str(urlopen('https://ipv6.icanhazip.com').read(), encoding='utf-8')
-    if result_queue is not None:
-        result_queue.put(myip)
-    return myip
+    try:
+        myip = netaddr.IPAddress(myip).format(dialect=netaddr.ipv6_verbose)
+        if result_queue is not None:
+            result_queue.put(myip)
+        return myip
+    except:
+        pass
 
 def ifconfig_co_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = ''
@@ -57,11 +70,12 @@ def ifconfig_co_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     try:
         subproc = subprocess.run(['curl', '-6', 'https://ifconfig.co'], timeout=5, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         myip = str(subproc.stdout, encoding='utf-8')
-    except subprocess.TimeoutExpired:
+        myip = netaddr.IPAddress(myip).format(dialect=netaddr.ipv6_verbose)
+        if result_queue is not None:
+            result_queue.put(myip)
+        return myip
+    except:
         pass
-    if result_queue is not None:
-        result_queue.put(myip)
-    return myip
 
 API_V4 = [ip_sb_v4, ipify_v4, icanhazip_v4, ifconfig_co_v4]
 API_V6 = [ip_sb_v6, ipify_v6, icanhazip_v6, ifconfig_co_v6]

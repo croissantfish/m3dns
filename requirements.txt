@@ -3,6 +3,7 @@ requests
 flask
 waitress
 Flask-APScheduler
+netaddr
 
 # Aliyun API requirements
 aliyun-python-sdk-core-v3
