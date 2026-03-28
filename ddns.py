@@ -48,9 +48,9 @@ def index() -> str:
 
 @scheduler.task(
     'interval', id='update_ddns_records', seconds=300,
-    misfire_grace_time=900, next_run_time=datetime.datetime.now(),
+    misfire_grace_time=900, next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=10),
 )
-@app.route('/healthcheck')
+@app.route('/force-update')
 def update_records():
     ipv4 = app.config['ipv4']
     ipv6 = app.config['ipv6']
