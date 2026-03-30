@@ -28,6 +28,7 @@ def ip_sb_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
         return myip
     except:
         pass
+    return myip
 
 def ipify_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
     myip = ''
@@ -53,6 +54,7 @@ def ipify_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
         return myip
     except:
         pass
+    return myip
 
 
 def icanhazip_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
@@ -79,6 +81,7 @@ def icanhazip_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
         return myip
     except:
         pass
+    return myip
 
 
 def ifconfig_co_v4(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
@@ -105,40 +108,38 @@ def ifconfig_co_v6(result_queue: Optional[mp.Queue] = None) -> Optional[str]:
         return myip
     except:
         pass
+    return myip
 
 API_V4 = [ip_sb_v4, ipify_v4, icanhazip_v4, ifconfig_co_v4]
 API_V6 = [ip_sb_v6, ipify_v6, icanhazip_v6, ifconfig_co_v6]
 
-def get_public_ip_addr_ver4() -> str:
+def get_public_ip_addr(vers: int = 4) -> str:
+    if vers == 4:
+        APIs = API_V4
+    else:
+        APIs = API_V6
     ip2ret = ''
     shared_queue = mp.Queue()
     processes = []
-    for api in API_V4:
-        p = mp.Process(target=api, args=(shared_queue,))
-        p.start()
-        processes.append(p)
-    processes[0].join(timeout=5)
-    if not shared_queue.empty():
-        ip2ret = shared_queue.get()
-    for p in processes:
-        p.terminate()
-    return ip2ret
-
-def get_public_ip_addr_ver6() -> str:
-    ip2ret = ''
-    shared_queue = mp.Queue()
-    processes = []
-    for api in API_V6:
+    for api in APIs:
         p = mp.Process(target=api, args=(shared_queue,))
         p.start()
         processes.append(p)
     while shared_queue.empty():
         time.sleep(0.1)
+        if not any(p.is_alive() for p in processes):
+            break
     if not shared_queue.empty():
         ip2ret = shared_queue.get()
     for p in processes:
         p.terminate()
     return ip2ret
+
+def get_public_ip_addr_ver4() -> str:
+    return get_public_ip_addr(4)
+
+def get_public_ip_addr_ver6() -> str:
+    return get_public_ip_addr(6)
 
 
 __all__ = [
